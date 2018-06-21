@@ -16,6 +16,8 @@ import javafx.scene.text.Font;
 
 public class Main extends Application {
 
+    private boolean turnX = true;
+
     private Parent createContent() {
         Pane root = new Pane();
         root.setPrefSize(300, 300);
@@ -60,10 +62,17 @@ public class Main extends Application {
             setOnMouseClicked(event -> {
                 //PRIMARY is the left and SECONDARY is the right mouse button.
                 if (event.getButton() == MouseButton.PRIMARY) {
+                    if (!turnX) {
+                        return;
+                    }
                     drawX();
-                }
-                else if (event.getButton() == MouseButton.SECONDARY) {
+                    turnX = false;
+                } else if (event.getButton() == MouseButton.SECONDARY) {
+                    if (turnX) {
+                        return;
+                    }
                     drawO();
+                    turnX = true;
                 }
             });
         }
