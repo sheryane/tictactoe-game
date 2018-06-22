@@ -1,5 +1,8 @@
 package pl.sheryane.tictactoe;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
@@ -9,23 +12,26 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.scene.text.Text;
 import javafx.scene.text.Font;
+import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class Main extends Application {
 
+    private Pane root = new Pane();
     private boolean playable = true;
     private boolean turnX = true;
     private Tile[][] board = new Tile[3][3];
     private List<Combo> combos = new ArrayList<>();
 
     private Parent createContent() {
-        Pane root = new Pane();
+
         root.setPrefSize(300, 300);
 
         for (int i = 0; i < 3; i++) {
@@ -69,9 +75,27 @@ public class Main extends Application {
         for (Combo combo : combos) {
             if (combo.isComplete()) {
                 playable = false;
+                playWinAnimation(combo);
                 break;
             }
         }
+    }
+
+    //Animation going from one point, through second point, to the last one.
+    private void playWinAnimation(Combo combo) {
+        Line line = new Line();
+        line.setStartX(combo.tiles[0].getCenterX());
+        line.setStartY(combo.tiles[0].getCenterY());
+        line.setEndX(combo.tiles[0].getCenterX());
+        line.setEndY(combo.tiles[0].getCenterY());
+
+        root.getChildren().add(line);
+
+        Timeline timeline = new Timeline();
+        timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(1),
+                new KeyValue(line.endXProperty(), combo.tiles[2].getCenterX()),
+                new KeyValue(line.endYProperty(), combo.tiles[2].getCenterY())));
+        timeline.play();
     }
 
     private class Combo {
@@ -128,6 +152,14 @@ public class Main extends Application {
                     checkState();
                 }
             });
+        }
+
+        public double getCenterX() {
+            return getTranslateX() + 50;
+        }
+
+        public double getCenterY() {
+            return getTranslateY() + 50;
         }
 
         public String getValue() {
